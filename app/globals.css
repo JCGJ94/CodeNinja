@@ -85,3 +85,6 @@ input:focus, textarea:focus, select:focus {
   -ms-user-select: none;
   user-select: none;
 }
+option{
+  background:#0a0a0f;
+}

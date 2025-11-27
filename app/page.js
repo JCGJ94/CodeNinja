@@ -41,6 +41,7 @@ export default function Home() {
       [name]: type === 'checkbox' ? checked : value
     }))
   }
+  
   const validateForm = () => {
     if (!formData.name || !formData.email || !formData.projectType || !formData.budget || !formData.description || !formData.privacy) {
       alert('⚠️ Por favor completa todos los campos obligatorios.')
@@ -54,45 +55,61 @@ export default function Home() {
     return true
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validateForm()) return
 
     setFormStatus('sending')
 
-    const subject = encodeURIComponent(`Nuevo contacto: ${formData.name}`)
-    const body = encodeURIComponent(`
-Nombre: ${formData.name}
-Empresa: ${formData.company}
-Email: ${formData.email}
-Teléfono: ${formData.phone}
-Tipo de Proyecto: ${formData.projectType}
-Presupuesto: ${formData.budget}
-Timeline: ${formData.timeline}
-Descripción: ${formData.description}
-  `)
-
-    window.location.href = `mailto:jegstudiotech@gmail.com?subject=${subject}&body=${body}`
-
-    setTimeout(() => {
-      setFormStatus('success')
-      setFormData({
-        name: '',
-        company: '',
-        email: '',
-        phone: '',
-        projectType: '',
-        budget: '',
-        timeline: '',
-        description: '',
-        privacy: false,
+    try {
+      // REEMPLAZA 'TU_FORMSPREE_ID' con tu ID de Formspree
+      // Ejemplo: 'mwkdvqbl' si tu URL es https://formspree.io/f/mwkdvqbl
+      const response = await fetch('https://formspree.io/f/mqavqyyw', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nombre: formData.name,
+          empresa: formData.company,
+          email: formData.email,
+          telefono: formData.phone,
+          tipoProyecto: formData.projectType,
+          presupuesto: formData.budget,
+          timeline: formData.timeline,
+          descripcion: formData.description,
+          _subject: `🚀 Nuevo contacto: ${formData.name}`,
+          _replyto: formData.email, // Para responder directamente al cliente
+        }),
       })
 
-      // AUTO-CERRAR el mensaje después de 3 segundos
-      setTimeout(() => {
-        setFormStatus('')
-      }, 3000)
-    }, 500)
+      if (response.ok) {
+        setFormStatus('success')
+        setFormData({
+          name: '',
+          company: '',
+          email: '',
+          phone: '',
+          projectType: '',
+          budget: '',
+          timeline: '',
+          description: '',
+          privacy: false,
+        })
+
+        // AUTO-CERRAR el mensaje después de 5 segundos
+        setTimeout(() => {
+          setFormStatus('')
+        }, 5000)
+      } else {
+        setFormStatus('error')
+        setTimeout(() => setFormStatus(''), 5000)
+      }
+    } catch (error) {
+      console.error('Error:', error)
+      setFormStatus('error')
+      setTimeout(() => setFormStatus(''), 5000)
+    }
   }
 
   return (
@@ -1001,6 +1018,16 @@ Descripción: ${formData.description}
                     className="mt-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 text-center backdrop-blur-sm"
                   >
                     ✓ ¡Mensaje enviado! Te responderemos pronto.
+                  </motion.div>
+                )}
+
+                {formStatus === 'error' && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-center backdrop-blur-sm"
+                  >
+                    ⚠️ Error al enviar. Por favor, inténtalo de nuevo.
                   </motion.div>
                 )}
               </form>
