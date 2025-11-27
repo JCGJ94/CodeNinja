@@ -14,13 +14,8 @@ const nextConfig = {
     minimumCacheTTL: 31536000,
   },
 
-  // Minificación SWC (más rápida que Terser)
+  // Minificación SWC
   swcMinify: true,
-  
-  // Optimizaciones experimentales
-  experimental: {
-    optimizeCss: true,
-  },
 
   // Headers para caching agresivo
   async headers() {
@@ -50,7 +45,7 @@ const nextConfig = {
   // Compresión
   compress: true,
 
-  // Optimización de producción
+  // Sin source maps en producción
   productionBrowserSourceMaps: false,
 }
 
