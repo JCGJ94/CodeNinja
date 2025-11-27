@@ -596,7 +596,7 @@ export default function Home() {
               {[
                 {
                   name: 'SportBar League',
-                  url: 'https://sample-service-name-2ppv.onrender.com/',
+                  url: '',
                   category: 'Web',
                   description: 'Web social de grupos y eventos abiertos.',
                   tech: ['React', 'Python', 'PostgreSQL'],
@@ -616,7 +616,7 @@ export default function Home() {
                 },
                 {
                   name: 'Futuro estudio',
-                  url: 'https://web-dev-two-livid.vercel.app/',
+                  url: '',
                   category: 'web',
                   description: 'Futuro estudio del grupo.',
                   tech: ['React', 'Node.js', "javascript", "particle", "tailwind"],
