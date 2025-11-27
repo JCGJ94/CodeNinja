@@ -1,8 +1,14 @@
 'use client'
-
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 
 export default function JEGSLogo() {
+    const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
   return (
     <div className="relative w-full h-full flex items-center justify-center">
       <svg
@@ -336,7 +342,7 @@ export default function JEGSLogo() {
         </motion.text>
 
         {/* Partículas flotantes alrededor del orbe */}
-        {[...Array(12)].map((_, i) => {
+        {isMounted &&  [...Array(12)].map((_, i) => {
           const angle = (i * 30 * Math.PI) / 180
           const radius = 80
           const initialX = 200 + Math.cos(angle) * radius
