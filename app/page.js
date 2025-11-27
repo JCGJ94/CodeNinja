@@ -625,7 +625,7 @@ export default function Home() {
                     className="mt-1 w-5 h-5 rounded border-cyan-500/30 bg-black/30 text-cyan-500 focus:ring-cyan-500"
                   />
                   <span className="text-sm text-gray-400">
-                    Acepto la <a href="#" className="text-cyan-400 hover:text-purple-400 underline">política de privacidad</a> *
+                    Acepto la política de privacidad *
                   </span>
                 </label>
               </div>
@@ -692,12 +692,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="border-t border-cyan-500/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-gray-500 text-sm">© 2024 JEG Studios. Todos los derechos reservados.</p>
-            <div className="flex gap-6 text-gray-500 text-sm">
-              <a href="#" className="hover:text-cyan-400 transition-colors">Aviso Legal</a>
-              <a href="#" className="hover:text-cyan-400 transition-colors">Privacidad</a>
-            </div>
+          <div className="border-t border-cyan-500/10 pt-8 flex flex-col md:flex-row justify-center items-center gap-4">
+            <p className="text-gray-500 text-sm">© 2025 JEG Studios. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>
