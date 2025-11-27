@@ -1,8 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, lazy, Suspense } from 'react'
 import Image from 'next/image'
-import JEGSLogo from './components/JEGSLogo'
+import dynamic from 'next/dynamic'
+
+// Lazy load del logo (no es crítico para LCP)
+const JEGSLogo = dynamic(() => import('./components/JEGSLogo'), {
+  loading: () => <div className="w-full aspect-square max-w-lg mx-auto bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl animate-pulse" />,
+  ssr: false
+})
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -93,11 +99,11 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-[#0a0a0f] text-white overflow-hidden">
-      {/* Background estático optimizado */}
-      <div className="fixed inset-0 z-0">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.03)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]"></div>
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-[120px] opacity-30"></div>
-        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] opacity-30"></div>
+      {/* Background estático optimizado - solo CSS */}
+      <div className="fixed inset-0 z-0 pointer-events-none">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(6,182,212,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(6,182,212,0.03)_1px,transparent_1px)] bg-[size:50px_50px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_0%,#000_70%,transparent_110%)]" />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-[120px] opacity-30" />
+        <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] opacity-30" />
       </div>
 
       {/* Navigation */}
@@ -130,15 +136,15 @@ export default function Home() {
         </div>
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - OPTIMIZADO */}
       <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full text-cyan-400 font-medium text-sm mb-6 border border-cyan-500/30 bg-cyan-500/5">
                 <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500" />
                 </span>
                 Respuesta en menos de 24h
               </div>
@@ -171,34 +177,36 @@ export default function Home() {
                 </a>
               </div>
 
-              {/* Stats */}
+              {/* Stats - SIMPLIFICADO */}
               <div className="grid grid-cols-3 gap-8 mt-12 pt-12 border-t border-cyan-500/10">
-                {[
-                  { value: '15+', label: 'Años Experiencia' },
-                  { value: '4-6', label: 'Semanas MVP' },
-                  { value: '50+', label: 'Proyectos' }
-                ].map((stat, i) => (
-                  <div key={i} className="hover:-translate-y-1 transition-transform">
-                    <div className="font-display text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                      {stat.value}
-                    </div>
-                    <div className="text-gray-500 text-sm mt-1">{stat.label}</div>
-                  </div>
-                ))}
+                <div>
+                  <div className="font-display text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">15+</div>
+                  <div className="text-gray-500 text-sm mt-1">Años Experiencia</div>
+                </div>
+                <div>
+                  <div className="font-display text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">4-6</div>
+                  <div className="text-gray-500 text-sm mt-1">Semanas MVP</div>
+                </div>
+                <div>
+                  <div className="font-display text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">50+</div>
+                  <div className="text-gray-500 text-sm mt-1">Proyectos</div>
+                </div>
               </div>
             </div>
 
-            {/* Logo optimizado */}
+            {/* Logo con lazy loading */}
             <div className="relative hidden lg:block">
               <div className="relative w-full aspect-square max-w-lg mx-auto">
-                <JEGSLogo />
+                <Suspense fallback={<div className="w-full h-full bg-gradient-to-br from-cyan-500/10 to-purple-500/10 rounded-2xl animate-pulse" />}>
+                  <JEGSLogo />
+                </Suspense>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Las 3B - Optimizado */}
+      {/* Las 3B - SIMPLIFICADO */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
@@ -213,37 +221,29 @@ export default function Home() {
           <div className="grid md:grid-cols-3 gap-8">
             {[
               {
-                letter: 'B',
                 title: 'Bueno',
                 subtitle: 'Calidad Profesional',
-                description: 'Code review exhaustivo, testing automatizado y documentación completa. Tu proyecto será mantenible, escalable y profesional.',
+                description: 'Code review exhaustivo, testing automatizado y documentación completa.',
                 gradient: 'from-cyan-500 to-cyan-600',
               },
               {
-                letter: 'B',
                 title: 'Bonito',
                 subtitle: 'Diseño Moderno',
-                description: 'Interfaces elegantes y experiencias de usuario excepcionales. Diseño responsive que se ve perfecto en cualquier dispositivo.',
+                description: 'Interfaces elegantes y experiencias de usuario excepcionales.',
                 gradient: 'from-purple-500 to-purple-600',
               },
               {
-                letter: 'B',
                 title: 'Barato',
                 subtitle: 'Precio Justo',
-                description: 'Precios competitivos sin sacrificar calidad. Equipo eficiente que maximiza tu inversión y entrega resultados.',
+                description: 'Precios competitivos sin sacrificar calidad.',
                 gradient: 'from-cyan-600 to-purple-500',
               }
             ].map((item, index) => (
-              <div key={index} className="group relative hover:-translate-y-2 transition-transform">
-                <div className={`absolute -inset-0.5 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-20 group-hover:opacity-40 transition`}></div>
+              <div key={index} className="group relative">
+                <div className={`absolute -inset-0.5 bg-gradient-to-r ${item.gradient} rounded-2xl blur opacity-20 group-hover:opacity-40 transition`} />
                 <div className="relative bg-[#0f0f1a] rounded-2xl p-8 border border-cyan-500/10 h-full">
-                  <div className="relative mb-6">
-                    <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${item.gradient} flex items-center justify-center border-2 border-white/20 shadow-2xl`}>
-                      <span className="font-display text-5xl font-black text-white">B</span>
-                    </div>
-                    <div className="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-lg">
-                      <span className="font-display text-sm font-bold text-gray-900">{index + 1}</span>
-                    </div>
+                  <div className={`w-20 h-20 rounded-2xl bg-gradient-to-br ${item.gradient} flex items-center justify-center border-2 border-white/20 shadow-2xl mb-6`}>
+                    <span className="font-display text-5xl font-black text-white">B</span>
                   </div>
                   <h3 className="font-display text-3xl font-bold mb-2 text-white">{item.title}</h3>
                   <p className="text-sm text-gray-400 uppercase tracking-wider mb-4 font-semibold">{item.subtitle}</p>
@@ -252,22 +252,10 @@ export default function Home() {
               </div>
             ))}
           </div>
-
-          <div className="text-center mt-12">
-            <p className="text-gray-400 mb-6">
-              No tienes que elegir entre calidad, diseño y precio. Con nosotros lo tienes todo.
-            </p>
-            <a
-              href="#contacto"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-full font-semibold text-white hover:opacity-90 transition-opacity"
-            >
-              Solicitar Presupuesto Gratis
-            </a>
-          </div>
         </div>
       </section>
 
-      {/* Services - Optimizado */}
+      {/* Services - SIMPLIFICADO */}
       <section id="servicios" className="py-20 px-4 sm:px-6 lg:px-8 relative">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
@@ -283,11 +271,10 @@ export default function Home() {
             {[
               {
                 title: 'Desarrollo Web',
-                techs: ['React', 'Next.js', 'Vue.js', 'Tailwind CSS'],
+                techs: ['React', 'Next.js', 'Tailwind'],
                 time: '4-8 semanas',
                 price: 'Desde 3.000€',
-                description: 'Aplicaciones web modernas, rápidas y SEO-optimizadas.',
-                gradient: 'from-cyan-500 to-cyan-600'
+                description: 'Aplicaciones web modernas y SEO-optimizadas.',
               },
               {
                 title: 'Apps Móviles',
@@ -295,29 +282,26 @@ export default function Home() {
                 time: '6-12 semanas',
                 price: 'Desde 5.000€',
                 description: 'Apps nativas con una sola base de código.',
-                gradient: 'from-purple-500 to-purple-600'
               },
               {
                 title: 'Backend & APIs',
-                techs: ['Python', 'Node.js', 'FastAPI', 'PostgreSQL'],
+                techs: ['Python', 'Node.js', 'PostgreSQL'],
                 time: '3-6 semanas',
                 price: 'Desde 2.500€',
                 description: 'Arquitecturas escalables y seguras.',
-                gradient: 'from-cyan-600 to-purple-500'
               },
               {
                 title: 'Consultoría Técnica',
-                techs: ['Architecture', 'Code Review', 'Performance'],
+                techs: ['Architecture', 'Code Review'],
                 time: 'Flexible',
                 price: 'Desde 1.000€',
                 description: 'Auditoría y optimización de código.',
-                gradient: 'from-purple-600 to-cyan-500'
               }
             ].map((service, index) => (
-              <div key={index} className="group relative hover:-translate-y-1 transition-transform">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition"></div>
+              <div key={index} className="group relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition" />
                 <div className="relative bg-[#0f0f1a] rounded-2xl p-8 border border-cyan-500/10 h-full">
-                  <div className={`inline-block px-4 py-2 rounded-lg bg-gradient-to-r ${service.gradient} text-white font-semibold text-sm mb-4`}>
+                  <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold text-sm mb-4">
                     {service.time}
                   </div>
                   <h3 className="font-display text-3xl font-bold text-white mb-3">{service.title}</h3>
@@ -344,16 +328,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Portfolio - Optimizado con Next Image */}
+      {/* Portfolio - OPTIMIZADO con priority en primera imagen */}
       <section id="portfolio" className="py-20 px-4 sm:px-6 lg:px-8 relative">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
               Proyectos Destacados
             </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Resultados reales de nuestros clientes
-            </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -363,52 +344,39 @@ export default function Home() {
                 url: 'https://sample-service-name-2ppv.onrender.com/',
                 category: 'Web',
                 description: 'Web social de grupos y eventos abiertos.',
-                tech: ['React', 'Python', 'PostgreSQL'],
-                metric: '4.8★ rating',
-                image: '/Bar.png',
-                gradient: 'from-purple-500 to-pink-500'
+                tech: ['React', 'Python'],
+                image: '/Bar.webp',
               },
               {
                 name: 'Sentya',
                 url: 'https://sentya.aossa.es/',
                 category: 'Web',
-                description: 'Plataforma de gestion de talleres sociales de ayuntamientos de Andalucia.',
-                tech: ['React', 'Python', 'PostgreSQL'],
-                metric: '10K+ usuarios',
-                image: '/Sentya.png',
-                gradient: 'from-cyan-500 to-blue-500'
+                description: 'Plataforma de gestión de talleres sociales.',
+                tech: ['React', 'Python'],
+                image: '/Sentya.webp',
               },
               {
                 name: 'Futuro estudio',
                 url: 'https://web-dev-two-livid.vercel.app/',
                 category: 'web',
                 description: 'Futuro estudio del grupo.',
-                tech: ['React', 'Node.js', 'Tailwind'],
-                metric: 'demo',
-                image: '/Monks.png',
-                gradient: 'from-cyan-500 to-purple-500'
+                tech: ['React', 'Node.js'],
+                image: '/Monks.webp',
               },
             ].map((project, index) => (
-              <div key={index} className="group relative hover:-translate-y-2 transition-transform">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition"></div>
+              <div key={index} className="group relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition" />
                 <div className="relative bg-[#0f0f1a] rounded-2xl overflow-hidden border border-cyan-500/10 h-full flex flex-col">
                   <div className="relative h-48 overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
-                    <div className={`absolute inset-0 bg-gradient-to-br ${project.gradient} opacity-20`}></div>
-                    <div className="relative w-full h-full flex items-center justify-center p-4">
-                      <Image 
-                        src={project.image} 
-                        alt={project.name}
-                        width={400}
-                        height={300}
-                        className="object-cover w-full h-full"
-                        loading="lazy"
-                      />
-                    </div>
-                    <div className="absolute top-3 left-3">
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold bg-gradient-to-r ${project.gradient} text-white shadow-lg`}>
-                        {project.category}
-                      </span>
-                    </div>
+                    <Image 
+                      src={project.image} 
+                      alt={project.name}
+                      width={400}
+                      height={300}
+                      className="object-cover w-full h-full"
+                      priority={index === 0}
+                      loading={index === 0 ? 'eager' : 'lazy'}
+                    />
                   </div>
                   <div className="p-6 flex-1 flex flex-col">
                     <div className="flex items-start justify-between mb-3">
@@ -420,18 +388,12 @@ export default function Home() {
                       </a>
                     </div>
                     <p className="text-gray-400 text-sm mb-4 flex-1">{project.description}</p>
-                    <div className="flex flex-wrap gap-2 mb-4">
+                    <div className="flex flex-wrap gap-2">
                       {project.tech.map((tech, i) => (
                         <span key={i} className="px-2 py-1 bg-cyan-500/10 text-cyan-400 rounded text-xs border border-cyan-500/20">
                           {tech}
                         </span>
                       ))}
-                    </div>
-                    <div className="pt-4 border-t border-cyan-500/10 flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="w-2 h-2 rounded-full bg-green-400"></div>
-                        <span className="text-green-400 font-semibold text-sm">{project.metric}</span>
-                      </div>
                     </div>
                   </div>
                 </div>
@@ -441,16 +403,13 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Process - Optimizado */}
+      {/* Process - SIMPLIFICADO */}
       <section id="proceso" className="py-20 px-4 sm:px-6 lg:px-8 relative">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
               Cómo Trabajamos
             </h2>
-            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-              Proceso transparente desde el día uno
-            </p>
           </div>
 
           <div className="grid md:grid-cols-4 gap-8">
@@ -460,11 +419,8 @@ export default function Home() {
               { step: '03', title: 'Desarrollo', description: 'Sprints de 2 semanas.' },
               { step: '04', title: 'Entrega', description: '30 días de soporte incluido.' }
             ].map((item, index) => (
-              <div key={index} className="relative hover:-translate-y-1 transition-transform">
-                {index < 3 && (
-                  <div className="hidden md:block absolute top-16 left-full w-full h-0.5 bg-gradient-to-r from-cyan-500/50 to-transparent z-0"></div>
-                )}
-                <div className="relative bg-[#0f0f1a] rounded-2xl p-6 border border-cyan-500/10 hover:border-cyan-500/30 transition-colors">
+              <div key={index} className="relative">
+                <div className="relative bg-[#0f0f1a] rounded-2xl p-6 border border-cyan-500/10">
                   <div className="font-display text-5xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-4">
                     {item.step}
                   </div>
@@ -477,7 +433,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Contact Form - Optimizado */}
+      {/* Contact Form - OPTIMIZADO */}
       <section id="contacto" className="py-20 px-4 sm:px-6 lg:px-8 relative">
         <div className="max-w-4xl mx-auto relative z-10">
           <div className="text-center mb-16">
@@ -485,12 +441,12 @@ export default function Home() {
               Solicita tu Presupuesto
             </h2>
             <p className="text-xl text-gray-400">
-              Respuesta en menos de 24 horas. Primera consultoría gratis.
+              Respuesta en menos de 24 horas
             </p>
           </div>
 
           <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-3xl blur opacity-20 group-hover:opacity-30 transition"></div>
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-3xl blur opacity-20 group-hover:opacity-30 transition" />
             <form onSubmit={handleSubmit} className="relative bg-[#0f0f1a] rounded-3xl p-8 md:p-12 border border-cyan-500/10">
               <div className="grid md:grid-cols-2 gap-6 mb-6">
                 <div>
@@ -507,21 +463,6 @@ export default function Home() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="company" className="block text-sm font-semibold text-gray-300 mb-2">Empresa</label>
-                  <input
-                    type="text"
-                    id="company"
-                    name="company"
-                    value={formData.company}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white placeholder-gray-500"
-                    placeholder="Tu empresa"
-                  />
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6 mb-6">
-                <div>
                   <label htmlFor="email" className="block text-sm font-semibold text-gray-300 mb-2">Email *</label>
                   <input
                     type="email"
@@ -532,18 +473,6 @@ export default function Home() {
                     onChange={handleChange}
                     className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white placeholder-gray-500"
                     placeholder="tu@email.com"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="phone" className="block text-sm font-semibold text-gray-300 mb-2">Teléfono</label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white placeholder-gray-500"
-                    placeholder="+34 600 000 000"
                   />
                 </div>
               </div>
@@ -587,22 +516,6 @@ export default function Home() {
               </div>
 
               <div className="mb-6">
-                <label htmlFor="timeline" className="block text-sm font-semibold text-gray-300 mb-2">Timeline</label>
-                <select
-                  id="timeline"
-                  name="timeline"
-                  value={formData.timeline}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white"
-                >
-                  <option value="">Selecciona...</option>
-                  <option value="urgente">Urgente (menos de 4 semanas)</option>
-                  <option value="normal">Normal (4-8 semanas)</option>
-                  <option value="flexible">Flexible (más de 8 semanas)</option>
-                </select>
-              </div>
-
-              <div className="mb-6">
                 <label htmlFor="description" className="block text-sm font-semibold text-gray-300 mb-2">Cuéntanos sobre tu proyecto *</label>
                 <textarea
                   id="description"
@@ -613,7 +526,7 @@ export default function Home() {
                   onChange={handleChange}
                   className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all resize-none text-white placeholder-gray-500"
                   placeholder="Describe tu proyecto..."
-                ></textarea>
+                />
               </div>
 
               <div className="mb-8">
@@ -656,7 +569,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer - Optimizado */}
+      {/* Footer - SIMPLIFICADO */}
       <footer className="relative py-16 px-4 sm:px-6 lg:px-8 border-t border-cyan-500/10">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
@@ -673,7 +586,6 @@ export default function Home() {
                 <li><a href="#servicios" className="hover:text-cyan-400 transition-colors">Desarrollo Web</a></li>
                 <li><a href="#servicios" className="hover:text-cyan-400 transition-colors">Apps Móviles</a></li>
                 <li><a href="#servicios" className="hover:text-cyan-400 transition-colors">Backend & APIs</a></li>
-                <li><a href="#servicios" className="hover:text-cyan-400 transition-colors">Consultoría</a></li>
               </ul>
             </div>
 
@@ -688,13 +600,11 @@ export default function Home() {
 
             <div>
               <h4 className="font-display font-bold mb-4 text-white">Contacto</h4>
-              <ul className="space-y-2 text-gray-400">
-                <li>jegstudiotech@gmail.com</li>
-              </ul>
+              <p className="text-gray-400">jegstudiotech@gmail.com</p>
             </div>
           </div>
 
-          <div className="border-t border-cyan-500/10 pt-8 flex flex-col md:flex-row justify-center items-center gap-4">
+          <div className="border-t border-cyan-500/10 pt-8 text-center">
             <p className="text-gray-500 text-sm">© 2024 JEG Studios. Todos los derechos reservados.</p>
           </div>
         </div>

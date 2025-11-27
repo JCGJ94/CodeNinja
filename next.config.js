@@ -5,23 +5,31 @@ const nextConfig = {
     removeConsole: process.env.NODE_ENV === 'production',
   },
   
-  // Optimización de imágenes
+  // Optimización de imágenes AGRESIVA
   images: {
-    domains: ['images.unsplash.com'],
     formats: ['image/avif', 'image/webp'],
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    deviceSizes: [640, 750, 828, 1080, 1200],
+    imageSizes: [16, 32, 48, 64, 96, 128, 256],
     minimumCacheTTL: 31536000,
+    dangerouslyAllowSVG: true,
+    contentDispositionType: 'attachment',
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
 
   // Minificación SWC
   swcMinify: true,
 
-  // Headers para caching agresivo
+  // Experimental - CLAVE PARA PERFORMANCE
+  experimental: {
+    optimizeCss: true,
+    optimizePackageImports: ['react', 'react-dom'],
+  },
+
+  // Headers para caching AGRESIVO
   async headers() {
     return [
       {
-        source: '/:all*(svg|jpg|jpeg|png|gif|ico|webp|avif)',
+        source: '/:all*(svg|jpg|jpeg|png|gif|ico|webp|avif|woff|woff2)',
         locale: false,
         headers: [
           {
@@ -39,6 +47,15 @@ const nextConfig = {
           }
         ],
       },
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'X-DNS-Prefetch-Control',
+            value: 'on'
+          },
+        ],
+      },
     ]
   },
 
@@ -47,14 +64,16 @@ const nextConfig = {
 
   // Sin source maps en producción
   productionBrowserSourceMaps: false,
+
+  // Optimización de build
+  poweredByHeader: false,
+  
+  // Reducir tamaño de bundle
+  modularizeImports: {
+    '@/components': {
+      transform: '@/components/{{member}}',
+    },
+  },
 }
 
 module.exports = nextConfig
-
-
-
-
-
-
-
-
