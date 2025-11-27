@@ -1,4 +1,6 @@
-export default function Error() {
+'use client'
+
+export default function Error({ error, reset }) {
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white flex items-center justify-center px-4">
       <div className="text-center">
