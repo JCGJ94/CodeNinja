@@ -1,4 +1,5 @@
 import './globals.css'
+import Script from 'next/script'
 
 export const metadata = {
   metadataBase: new URL('https://jegsdev.com'),
@@ -64,19 +65,32 @@ export default function RootLayout({ children }) {
         {/* Preconnect CRÍTICO - debe ir primero */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        
+
         {/* Preload SOLO fuentes críticas con display=swap */}
         <link
           href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Syne:wght@700;800&display=swap"
           rel="stylesheet"
         />
-        
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=G-L048P21DHX`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-L048P21DHX', {
+      page_path: window.location.pathname,
+    });
+  `}
+        </Script>
         {/* Favicon */}
         <link rel="icon" href="/favicon.ico" sizes="any" />
-        
+
         {/* Theme color */}
         <meta name="theme-color" content="#06b6d4" />
-        
+
         {/* Viewport optimizado */}
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       </head>

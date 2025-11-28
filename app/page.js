@@ -3,6 +3,8 @@
 import { useState, lazy, Suspense } from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
+import { trackEvent, trackFormSubmit, trackCTAClick, trackScroll50, trackTimeOnSite } from './lib/analytics'
+import { useEffect } from 'react'
 
 // Lazy load del logo (no es crítico para LCP)
 const JEGSLogo = dynamic(() => import('./components/JEGSLogo'), {
@@ -25,6 +27,38 @@ export default function Home() {
 
   const [formStatus, setFormStatus] = useState('')
 
+  // Tracking de scroll
+  useEffect(() => {
+    let scrollTracked = false;
+
+    const handleScroll = () => {
+      const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+      if (scrollPercent > 50 && !scrollTracked) {
+        trackScroll50();
+        scrollTracked = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Tracking de tiempo en sitio
+  useEffect(() => {
+    const startTime = Date.now();
+
+    const timer = setInterval(() => {
+      const timeOnSite = Math.floor((Date.now() - startTime) / 1000);
+      if (timeOnSite === 30) {
+        trackTimeOnSite(30);
+      } else if (timeOnSite === 60) {
+        trackTimeOnSite(60);
+      }
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target
     setFormData(prev => ({
@@ -32,7 +66,7 @@ export default function Home() {
       [name]: type === 'checkbox' ? checked : value
     }))
   }
-  
+
   const validateForm = () => {
     if (!formData.name || !formData.email || !formData.projectType || !formData.budget || !formData.description || !formData.privacy) {
       alert('⚠️ Por favor completa todos los campos obligatorios.')
@@ -74,6 +108,7 @@ export default function Home() {
 
       if (response.ok) {
         setFormStatus('success')
+        trackFormSubmit(formData)
         setFormData({
           name: '',
           company: '',
@@ -164,6 +199,7 @@ export default function Home() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <a
                   href="#contacto"
+                  onClick={() => trackCTAClick('hero_primary')}
                   className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg font-semibold text-white hover:opacity-90 transition-opacity"
                 >
                   Solicitar Presupuesto
@@ -368,8 +404,8 @@ export default function Home() {
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition" />
                 <div className="relative bg-[#0f0f1a] rounded-2xl overflow-hidden border border-cyan-500/10 h-full flex flex-col">
                   <div className="relative h-48 overflow-hidden bg-gradient-to-br from-gray-800 to-gray-900">
-                    <Image 
-                      src={project.image} 
+                    <Image
+                      src={project.image}
                       alt={project.name}
                       width={400}
                       height={300}
