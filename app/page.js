@@ -1,10 +1,9 @@
 'use client'
 
-import { useState, lazy, Suspense } from 'react'
+import { useState, lazy, Suspense, useEffect } from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-import { trackEvent, trackFormSubmit, trackCTAClick, trackScroll50, trackTimeOnSite } from './lib/analytics'
-import { useEffect } from 'react'
+import { trackFormSubmit, trackCTAClick, trackScroll50, trackTimeOnSite, trackMetaLead, trackGoogleAdsConversion } from './lib/analytics'
 
 // Lazy load del logo (no es crítico para LCP)
 const JEGSLogo = dynamic(() => import('./components/JEGSLogo'), {
@@ -27,7 +26,9 @@ export default function Home() {
 
   const [formStatus, setFormStatus] = useState('')
 
-  // Tracking de scroll
+  // ============================================
+  // TRACKING DE SCROLL
+  // ============================================
   useEffect(() => {
     let scrollTracked = false;
 
@@ -43,16 +44,23 @@ export default function Home() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Tracking de tiempo en sitio
+  // ============================================
+  // TRACKING DE TIEMPO EN SITIO
+  // ============================================
   useEffect(() => {
     const startTime = Date.now();
+    let tracked30s = false;
+    let tracked60s = false;
 
     const timer = setInterval(() => {
       const timeOnSite = Math.floor((Date.now() - startTime) / 1000);
-      if (timeOnSite === 30) {
+      
+      if (timeOnSite >= 30 && !tracked30s) {
         trackTimeOnSite(30);
-      } else if (timeOnSite === 60) {
+        tracked30s = true;
+      } else if (timeOnSite >= 60 && !tracked60s) {
         trackTimeOnSite(60);
+        tracked60s = true;
       }
     }, 1000);
 
@@ -108,7 +116,12 @@ export default function Home() {
 
       if (response.ok) {
         setFormStatus('success')
+        
+        // ✅ TRACKING DE CONVERSIÓN
         trackFormSubmit(formData)
+        trackMetaLead(formData)
+        trackGoogleAdsConversion(formData)
+        
         setFormData({
           name: '',
           company: '',
@@ -161,8 +174,10 @@ export default function Home() {
               ))}
             </div>
 
+            {/* ✅ CTA NAV - TRACKING AÑADIDO */}
             <a
               href="#contacto"
+              onClick={() => trackCTAClick('nav_cta')}
               className="relative group px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg font-semibold text-white hover:opacity-90 transition-opacity"
             >
               Hablemos
@@ -197,6 +212,7 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
+                {/* ✅ CTA HERO PRIMARY - TRACKING AÑADIDO */}
                 <a
                   href="#contacto"
                   onClick={() => trackCTAClick('hero_primary')}
@@ -205,8 +221,10 @@ export default function Home() {
                   Solicitar Presupuesto
                 </a>
 
+                {/* ✅ CTA HERO SECONDARY - TRACKING AÑADIDO */}
                 <a
                   href="#portfolio"
+                  onClick={() => trackCTAClick('hero_secondary')}
                   className="inline-flex items-center justify-center px-8 py-4 bg-transparent border border-cyan-500/30 rounded-lg font-semibold text-cyan-400 hover:bg-cyan-500/10 transition-colors"
                 >
                   Ver Portfolio
@@ -353,7 +371,12 @@ export default function Home() {
                     <span className="font-display text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
                       {service.price}
                     </span>
-                    <a href="#contacto" className="text-cyan-400 font-semibold hover:text-purple-400 transition-colors">
+                    {/* ✅ CTA SERVICIOS - TRACKING AÑADIDO */}
+                    <a 
+                      href="#contacto"
+                      onClick={() => trackCTAClick(`service_${service.title.toLowerCase().replace(/ /g, '_')}`)}
+                      className="text-cyan-400 font-semibold hover:text-purple-400 transition-colors"
+                    >
                       Solicitar →
                     </a>
                   </div>
@@ -417,7 +440,14 @@ export default function Home() {
                   <div className="p-6 flex-1 flex flex-col">
                     <div className="flex items-start justify-between mb-3">
                       <h3 className="font-display text-xl font-bold text-white">{project.name}</h3>
-                      <a href={project.url} target="_blank" rel="noopener noreferrer" className="text-cyan-400 hover:text-purple-400 transition-colors">
+                      {/* ✅ PORTFOLIO LINK - TRACKING AÑADIDO */}
+                      <a 
+                        href={project.url} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        onClick={() => trackCTAClick(`portfolio_${project.name.toLowerCase().replace(/ /g, '_')}`)}
+                        className="text-cyan-400 hover:text-purple-400 transition-colors"
+                      >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                         </svg>
@@ -619,24 +649,78 @@ export default function Home() {
             <div>
               <h4 className="font-display font-bold mb-4 text-white">Servicios</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#servicios" className="hover:text-cyan-400 transition-colors">Desarrollo Web</a></li>
-                <li><a href="#servicios" className="hover:text-cyan-400 transition-colors">Apps Móviles</a></li>
-                <li><a href="#servicios" className="hover:text-cyan-400 transition-colors">Backend & APIs</a></li>
+                <li>
+                  <a 
+                    href="#servicios"
+                    onClick={() => trackCTAClick('footer_servicios_web')}
+                    className="hover:text-cyan-400 transition-colors"
+                  >
+                    Desarrollo Web
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="#servicios"
+                    onClick={() => trackCTAClick('footer_servicios_mobile')}
+                    className="hover:text-cyan-400 transition-colors"
+                  >
+                    Apps Móviles
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="#servicios"
+                    onClick={() => trackCTAClick('footer_servicios_backend')}
+                    className="hover:text-cyan-400 transition-colors"
+                  >
+                    Backend & APIs
+                  </a>
+                </li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-display font-bold mb-4 text-white">Empresa</h4>
               <ul className="space-y-2 text-gray-400">
-                <li><a href="#portfolio" className="hover:text-cyan-400 transition-colors">Portfolio</a></li>
-                <li><a href="#proceso" className="hover:text-cyan-400 transition-colors">Proceso</a></li>
-                <li><a href="#contacto" className="hover:text-cyan-400 transition-colors">Contacto</a></li>
+                <li>
+                  <a 
+                    href="#portfolio"
+                    onClick={() => trackCTAClick('footer_portfolio')}
+                    className="hover:text-cyan-400 transition-colors"
+                  >
+                    Portfolio
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="#proceso"
+                    onClick={() => trackCTAClick('footer_proceso')}
+                    className="hover:text-cyan-400 transition-colors"
+                  >
+                    Proceso
+                  </a>
+                </li>
+                <li>
+                  <a 
+                    href="#contacto"
+                    onClick={() => trackCTAClick('footer_contacto')}
+                    className="hover:text-cyan-400 transition-colors"
+                  >
+                    Contacto
+                  </a>
+                </li>
               </ul>
             </div>
 
             <div>
               <h4 className="font-display font-bold mb-4 text-white">Contacto</h4>
-              <p className="text-gray-400">jegstudiotech@gmail.com</p>
+              <a 
+                href="mailto:jegstudiotech@gmail.com"
+                onClick={() => trackCTAClick('footer_email')}
+                className="text-gray-400 hover:text-cyan-400 transition-colors"
+              >
+                jegstudiotech@gmail.com
+              </a>
             </div>
           </div>
 

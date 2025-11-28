@@ -71,6 +71,14 @@ export default function RootLayout({ children }) {
           href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=Syne:wght@700;800&display=swap"
           rel="stylesheet"
         />
+        {/* Favicon */}
+        <link rel="icon" href="/favicon.ico" sizes="any" />
+
+        {/* Theme color */}
+        <meta name="theme-color" content="#06b6d4" />
+
+        {/* Viewport optimizado */}
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=G-L048P21DHX`}
           strategy="afterInteractive"
@@ -85,14 +93,6 @@ export default function RootLayout({ children }) {
     });
   `}
         </Script>
-        {/* Favicon */}
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-
-        {/* Theme color */}
-        <meta name="theme-color" content="#06b6d4" />
-
-        {/* Viewport optimizado */}
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
       </head>
       <body className="antialiased">
         {children}
