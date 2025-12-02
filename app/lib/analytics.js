@@ -69,20 +69,23 @@ export const trackMetaPageView = () => {
 
 export const trackGoogleAdsConversion = (formData) => {
   if (typeof window !== 'undefined' && window.gtag) {
-    // Opción 1: Enviar a Google Ads directamente
+    // 🔥 Conversión de Google Ads - Lead Form Submit
     window.gtag('event', 'conversion', {
-      send_to: 'AW-1776522089',
-      value: getBudgetValue(formData.budget),
-      currency: 'EUR',
-      transaction_id: generateTransactionId(),
+      'send_to': 'AW-1776522089/3iiYCJjO48obEOm53pc3',
+      'value': getBudgetValue(formData.budget),
+      'currency': 'EUR',
+      'transaction_id': generateTransactionId()
     });
     
-    // Opción 2: También enviar como evento personalizado
-    window.gtag('event', 'lead_generated', {
-      value: getBudgetValue(formData.budget),
-      currency: 'EUR',
-      project_type: formData.projectType,
-    });
+    // Debug en desarrollo
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Google Ads Conversion Tracked:', {
+        send_to: 'AW-1776522089/3iiYCJjO48obEOm53pc3',
+        value: getBudgetValue(formData.budget),
+        budget: formData.budget,
+        project_type: formData.projectType
+      });
+    }
   }
 };
 
