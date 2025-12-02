@@ -64,29 +64,26 @@ export const trackMetaPageView = () => {
 };
 
 // ============================================
-// GOOGLE ADS CONVERSION TRACKING
+// GOOGLE ADS CONVERSION TRACKING (CLICK EVENT)
 // ============================================
 
-export const trackGoogleAdsConversion = (formData) => {
+export const trackGoogleAdsConversion = (formData, url) => {
   if (typeof window !== 'undefined' && window.gtag) {
-    // 🔥 Conversión de Google Ads - Lead Form Submit
+    const callback = function () {
+      if (typeof(url) !== 'undefined') {
+        window.location = url;
+      }
+    };
+    
     window.gtag('event', 'conversion', {
       'send_to': 'AW-1776522089/3iiYCJjO48obEOm53pc3',
       'value': getBudgetValue(formData.budget),
       'currency': 'EUR',
-      'transaction_id': generateTransactionId()
+      'transaction_id': generateTransactionId(),
+      'event_callback': callback
     });
-    
-    // Debug en desarrollo
-    if (process.env.NODE_ENV === 'development') {
-      console.log('✅ Google Ads Conversion Tracked:', {
-        send_to: 'AW-1776522089/3iiYCJjO48obEOm53pc3',
-        value: getBudgetValue(formData.budget),
-        budget: formData.budget,
-        project_type: formData.projectType
-      });
-    }
   }
+  return false;
 };
 
 // ============================================
