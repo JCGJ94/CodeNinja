@@ -1,5 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -28,23 +26,9 @@
   .text-balance {
     text-wrap: balance;
   }
-
-  /* Animated gradient for text */
-  @keyframes gradient-x {
-    0%, 100% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-  }
-
-  .animate-gradient {
-    animation: gradient-x 3s ease infinite;
-  }
 }
 
-/* Custom scrollbar - tech style */
+/* Custom scrollbar - SOLO SI ES CRÍTICO */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -58,33 +42,28 @@
   border-radius: 4px;
 }
 
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #0891b2, #7e22ce);
-}
-
 /* Selection */
 ::selection {
   background-color: rgba(6, 182, 212, 0.3);
   color: #fff;
 }
 
-/* Smooth animations */
-* {
-  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Glow effect for focused inputs */
+/* Inputs - simplificado */
 input:focus, textarea:focus, select:focus {
-  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+  outline: none;
 }
 
-/* Prevent text selection on animated elements */
-.no-select {
-  -webkit-user-select: none;
-  -moz-user-select: none;
-  -ms-user-select: none;
-  user-select: none;
+option {
+  background: #0a0a0f;
 }
-option{
-  background:#0a0a0f;
+
+/* Font rendering optimizado */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Reducir layout shifts */
+img, video {
+  height: auto;
 }
