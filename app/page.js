@@ -26,6 +26,18 @@ export default function Home() {
   })
 
   const [formStatus, setFormStatus] = useState('')
+  const [showStickyNav, setShowStickyNav] = useState(false)
+
+  // ============================================
+  // STICKY NAV AL HACER SCROLL
+  // ============================================
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowStickyNav(window.scrollY > 100)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   // ============================================
   // TRACKING DE SCROLL
@@ -103,14 +115,14 @@ export default function Home() {
         },
         body: JSON.stringify({
           nombre: formData.name,
-          empresa: formData.company,
+          empresa: formData.company || 'No especificada',
           email: formData.email,
-          telefono: formData.phone,
+          telefono: formData.phone || 'No especificado',
           tipoProyecto: formData.projectType,
           presupuesto: formData.budget,
-          timeline: formData.timeline,
+          timeline: formData.timeline || 'No especificado',
           descripcion: formData.description,
-          _subject: `🚀 Nuevo contacto: ${formData.name}`,
+          _subject: `🚀 Nuevo contacto: ${formData.name}${formData.company ? ` - ${formData.company}` : ''}`,
           _replyto: formData.email,
         }),
       })
@@ -155,8 +167,12 @@ export default function Home() {
         <div className="absolute top-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-[120px] opacity-30" />
       </div>
 
-      {/* Navigation */}
-      <nav className="fixed top-0 w-full z-50 backdrop-blur-xl bg-[#0a0a0f]/80 border-b border-cyan-500/10">
+      {/* Navigation - MEJORADO con CTA sticky */}
+      <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+        showStickyNav 
+          ? 'backdrop-blur-xl bg-[#0a0a0f]/95 border-b border-cyan-500/20 shadow-lg' 
+          : 'backdrop-blur-xl bg-[#0a0a0f]/80 border-b border-cyan-500/10'
+      }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="font-display text-xl font-bold bg-gradient-to-r from-cyan-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
@@ -164,7 +180,7 @@ export default function Home() {
             </div>
 
             <div className="hidden md:flex space-x-8">
-              {['Servicios', 'Portfolio', 'Proceso', 'Contacto'].map((item) => (
+              {['Servicios', 'Portfolio', 'Proceso'].map((item) => (
                 <a
                   key={item}
                   href={`#${item.toLowerCase()}`}
@@ -175,19 +191,23 @@ export default function Home() {
               ))}
             </div>
 
-            {/* ✅ CTA NAV - TRACKING AÑADIDO */}
+            {/* CTA NAV - MÁS PROMINENTE cuando sticky */}
             <a
               href="#contacto"
               onClick={() => trackCTAClick('nav_cta')}
-              className="relative group px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg font-semibold text-white hover:opacity-90 transition-opacity"
+              className={`relative group font-semibold text-white hover:opacity-90 transition-all ${
+                showStickyNav 
+                  ? 'px-8 py-3 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg shadow-lg shadow-cyan-500/20' 
+                  : 'px-6 py-2 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg'
+              }`}
             >
-              Hablemos
+              {showStickyNav ? 'Solicitar Presupuesto' : 'Hablemos'}
             </a>
           </div>
         </div>
       </nav>
 
-      {/* Hero Section - OPTIMIZADO */}
+      {/* Hero Section - SIN CAMBIOS (funciona bien) */}
       <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto w-full relative z-10">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -213,16 +233,14 @@ export default function Home() {
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                {/* ✅ CTA HERO PRIMARY - TRACKING AÑADIDO */}
                 <a
                   href="#contacto"
                   onClick={() => trackCTAClick('hero_primary')}
-                  className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg font-semibold text-white hover:opacity-90 transition-opacity"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg font-semibold text-white hover:opacity-90 transition-opacity shadow-lg shadow-cyan-500/20"
                 >
-                  Solicitar Presupuesto
+                  Solicitar Presupuesto Gratis
                 </a>
 
-                {/* ✅ CTA HERO SECONDARY - TRACKING AÑADIDO */}
                 <a
                   href="#portfolio"
                   onClick={() => trackCTAClick('hero_secondary')}
@@ -232,7 +250,7 @@ export default function Home() {
                 </a>
               </div>
 
-              {/* Stats - SIMPLIFICADO */}
+              {/* Stats */}
               <div className="grid grid-cols-3 gap-8 mt-12 pt-12 border-t border-cyan-500/10">
                 <div>
                   <div className="font-display text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">15+</div>
@@ -261,7 +279,213 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Las 3B - SIMPLIFICADO */}
+      {/* ============================================ */}
+      {/* FORMULARIO AQUÍ - SECCIÓN 2 (CRÍTICO) */}
+      {/* ============================================ */}
+      <section id="contacto" className="py-20 px-4 sm:px-6 lg:px-8 relative bg-[#0f0f1a]/50">
+        <div className="max-w-4xl mx-auto relative z-10">
+          <div className="text-center mb-12">
+            <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              Solicita tu Presupuesto
+            </h2>
+            <p className="text-xl text-gray-400">
+              Respuesta en menos de 24 horas • Consultoría inicial gratuita
+            </p>
+          </div>
+
+          <div className="relative group">
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-3xl blur opacity-20 group-hover:opacity-30 transition" />
+            <form onSubmit={handleSubmit} className="relative bg-[#0a0a0f] rounded-3xl p-8 md:p-12 border border-cyan-500/10">
+              
+              {/* FORMULARIO COMPLETO Y PROFESIONAL */}
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-semibold text-gray-300 mb-2">Nombre *</label>
+                  <input
+                    type="text"
+                    id="name"
+                    name="name"
+                    required
+                    value={formData.name}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white placeholder-gray-500"
+                    placeholder="Tu nombre"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="company" className="block text-sm font-semibold text-gray-300 mb-2">Empresa</label>
+                  <input
+                    type="text"
+                    id="company"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white placeholder-gray-500"
+                    placeholder="Nombre de tu empresa"
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-semibold text-gray-300 mb-2">Email *</label>
+                  <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    required
+                    value={formData.email}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white placeholder-gray-500"
+                    placeholder="tu@email.com"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-semibold text-gray-300 mb-2">Teléfono</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white placeholder-gray-500"
+                    placeholder="+34 600 000 000"
+                  />
+                </div>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <label htmlFor="projectType" className="block text-sm font-semibold text-gray-300 mb-2">Tipo de Proyecto *</label>
+                  <select
+                    id="projectType"
+                    name="projectType"
+                    required
+                    value={formData.projectType}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white"
+                  >
+                    <option value="">Selecciona...</option>
+                    <option value="web">Web Corporativa</option>
+                    <option value="ecommerce">E-commerce</option>
+                    <option value="app">App Móvil</option>
+                    <option value="backend">Backend/API</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="budget" className="block text-sm font-semibold text-gray-300 mb-2">Presupuesto *</label>
+                  <select
+                    id="budget"
+                    name="budget"
+                    required
+                    value={formData.budget}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white"
+                  >
+                    <option value="">Selecciona...</option>
+                    <option value="<3000">Menos de 3.000€</option>
+                    <option value="3000-6000">3.000€ - 6.000€</option>
+                    <option value="6000-12000">6.000€ - 12.000€</option>
+                    <option value=">12000">Más de 12.000€</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <label htmlFor="timeline" className="block text-sm font-semibold text-gray-300 mb-2">Timeline</label>
+                <select
+                  id="timeline"
+                  name="timeline"
+                  value={formData.timeline}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white"
+                >
+                  <option value="">¿Cuándo necesitas el proyecto?</option>
+                  <option value="urgente">Lo antes posible</option>
+                  <option value="1-2meses">1-2 meses</option>
+                  <option value="3-6meses">3-6 meses</option>
+                  <option value="flexible">Flexible</option>
+                </select>
+              </div>
+
+              <div className="mb-6">
+                <label htmlFor="description" className="block text-sm font-semibold text-gray-300 mb-2">Cuéntanos sobre tu proyecto *</label>
+                <textarea
+                  id="description"
+                  name="description"
+                  required
+                  rows={5}
+                  value={formData.description}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all resize-none text-white placeholder-gray-500"
+                  placeholder="Describe tu proyecto, objetivos, timeline..."
+                />
+              </div>
+
+              <div className="mb-8">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="privacy"
+                    required
+                    checked={formData.privacy}
+                    onChange={handleChange}
+                    className="mt-1 w-5 h-5 rounded border-cyan-500/30 bg-black/30 text-cyan-500 focus:ring-cyan-500"
+                  />
+                  <span className="text-sm text-gray-400">
+                    Acepto la política de privacidad y el tratamiento de mis datos *
+                  </span>
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                disabled={formStatus === 'sending'}
+                className="w-full px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg font-bold text-lg text-white hover:opacity-90 transition-opacity disabled:opacity-50 shadow-lg shadow-cyan-500/20"
+              >
+                {formStatus === 'sending' ? 'Enviando...' : 'Solicitar Presupuesto Gratis'}
+              </button>
+
+              {formStatus === 'success' && (
+                <div className="mt-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 text-center">
+                  ✓ ¡Mensaje enviado! Te responderemos en menos de 24 horas.
+                </div>
+              )}
+
+              {formStatus === 'error' && (
+                <div className="mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-center">
+                  ⚠️ Error al enviar. Por favor, inténtalo de nuevo o escríbenos a jegstudiotech@gmail.com
+                </div>
+              )}
+
+              {/* Indicadores de confianza sutiles */}
+              <div className="mt-8 pt-8 border-t border-cyan-500/10 flex flex-col sm:flex-row items-center justify-center gap-6 text-sm text-gray-500">
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>Respuesta en 24h</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>Consultoría inicial gratis</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <svg className="w-5 h-5 text-cyan-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>Sin compromiso</span>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      {/* Las 3B */}
       <section className="py-20 px-4 sm:px-6 lg:px-8 relative">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
@@ -307,94 +531,114 @@ export default function Home() {
               </div>
             ))}
           </div>
+
+          {/* CTA después de 3B */}
+          <div className="text-center mt-16">
+            <a
+              href="#contacto"
+              onClick={() => trackCTAClick('3b_cta')}
+              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg font-semibold text-white hover:opacity-90 transition-opacity shadow-lg shadow-cyan-500/20"
+            >
+              Solicitar Presupuesto
+            </a>
+          </div>
         </div>
       </section>
 
-      {/* Services - SIMPLIFICADO */}
-   {/* Services - CON ENLACES A PÁGINAS ESPECÍFICAS */}
-<section id="servicios" className="py-20 px-4 sm:px-6 lg:px-8 relative">
-  <div className="max-w-7xl mx-auto relative z-10">
-    <div className="text-center mb-16">
-      <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-        Nuestros Servicios
-      </h2>
-      <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-        Tecnología moderna para proyectos que escalan
-      </p>
-    </div>
+      {/* Services */}
+      <section id="servicios" className="py-20 px-4 sm:px-6 lg:px-8 relative bg-[#0f0f1a]/50">
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="text-center mb-16">
+            <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+              Nuestros Servicios
+            </h2>
+            <p className="text-xl text-gray-400 max-w-2xl mx-auto">
+              Tecnología moderna para proyectos que escalan
+            </p>
+          </div>
 
-    <div className="grid md:grid-cols-2 gap-8">
-      {[
-        {
-          title: 'Desarrollo Web',
-          techs: ['React', 'Next.js', 'Tailwind'],
-          time: '4-8 semanas',
-          price: 'Desde 3.000€',
-          description: 'Aplicaciones web modernas y SEO-optimizadas.',
-          link: '/desarrollo-web-react',  // ← NUEVO
-        },
-        {
-          title: 'Apps Móviles',
-          techs: ['React Native', 'iOS', 'Android'],
-          time: '6-12 semanas',
-          price: 'Desde 5.000€',
-          description: 'Apps nativas con una sola base de código.',
-          link: '/desarrollo-app-movil',  // ← NUEVO
-        },
-        {
-          title: 'Backend & APIs',
-          techs: ['Python', 'Node.js', 'PostgreSQL'],
-          time: '3-6 semanas',
-          price: 'Desde 2.500€',
-          description: 'Arquitecturas escalables y seguras.',
-          link: '/desarrollo-backend-python',  // ← NUEVO
-        },
-        {
-          title: 'Consultoría Técnica',
-          techs: ['Architecture', 'Code Review'],
-          time: 'Flexible',
-          price: 'Desde 1.000€',
-          description: 'Auditoría y optimización de código.',
-          link: '#contacto',  // ← Sin página específica
-        }
-      ].map((service, index) => (
-        <div key={index} className="group relative">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition" />
-          <div className="relative bg-[#0f0f1a] rounded-2xl p-8 border border-cyan-500/10 h-full">
-            <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold text-sm mb-4">
-              {service.time}
-            </div>
-            <h3 className="font-display text-3xl font-bold text-white mb-3">{service.title}</h3>
-            <p className="text-gray-400 mb-6">{service.description}</p>
-            <div className="flex flex-wrap gap-2 mb-6">
-              {service.techs.map((tech, i) => (
-                <span key={i} className="px-3 py-1 bg-cyan-500/10 text-cyan-400 rounded-lg text-sm border border-cyan-500/20">
-                  {tech}
-                </span>
-              ))}
-            </div>
-            <div className="flex justify-between items-center pt-6 border-t border-cyan-500/10">
-              <span className="font-display text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                {service.price}
-              </span>
-              {/* ✅ ENLACE A PÁGINA ESPECÍFICA O CONTACTO */}
-              <Link 
-                href={service.link}
-                onClick={() => trackCTAClick(`service_${service.title.toLowerCase().replace(/ /g, '_')}`)}
-                className="text-cyan-400 font-semibold hover:text-purple-400 transition-colors inline-flex items-center gap-1"
-              >
-                {service.link.startsWith('#') ? 'Solicitar' : 'Más info'}
-                <span>→</span>
-              </Link>
-            </div>
+          <div className="grid md:grid-cols-2 gap-8">
+            {[
+              {
+                title: 'Desarrollo Web',
+                techs: ['React', 'Next.js', 'Tailwind'],
+                time: '4-8 semanas',
+                price: 'Desde 3.000€',
+                description: 'Aplicaciones web modernas y SEO-optimizadas.',
+                link: '/desarrollo-web-react',
+              },
+              {
+                title: 'Apps Móviles',
+                techs: ['React Native', 'iOS', 'Android'],
+                time: '6-12 semanas',
+                price: 'Desde 5.000€',
+                description: 'Apps nativas con una sola base de código.',
+                link: '/desarrollo-app-movil',
+              },
+              {
+                title: 'Backend & APIs',
+                techs: ['Python', 'Node.js', 'PostgreSQL'],
+                time: '3-6 semanas',
+                price: 'Desde 2.500€',
+                description: 'Arquitecturas escalables y seguras.',
+                link: '/desarrollo-backend-python',
+              },
+              {
+                title: 'Consultoría Técnica',
+                techs: ['Architecture', 'Code Review'],
+                time: 'Flexible',
+                price: 'Desde 1.000€',
+                description: 'Auditoría y optimización de código.',
+                link: '#contacto',
+              }
+            ].map((service, index) => (
+              <div key={index} className="group relative">
+                <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition" />
+                <div className="relative bg-[#0a0a0f] rounded-2xl p-8 border border-cyan-500/10 h-full">
+                  <div className="inline-block px-4 py-2 rounded-lg bg-gradient-to-r from-cyan-500 to-purple-500 text-white font-semibold text-sm mb-4">
+                    {service.time}
+                  </div>
+                  <h3 className="font-display text-3xl font-bold text-white mb-3">{service.title}</h3>
+                  <p className="text-gray-400 mb-6">{service.description}</p>
+                  <div className="flex flex-wrap gap-2 mb-6">
+                    {service.techs.map((tech, i) => (
+                      <span key={i} className="px-3 py-1 bg-cyan-500/10 text-cyan-400 rounded-lg text-sm border border-cyan-500/20">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="flex justify-between items-center pt-6 border-t border-cyan-500/10">
+                    <span className="font-display text-2xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
+                      {service.price}
+                    </span>
+                    <Link 
+                      href={service.link}
+                      onClick={() => trackCTAClick(`service_${service.title.toLowerCase().replace(/ /g, '_')}`)}
+                      className="text-cyan-400 font-semibold hover:text-purple-400 transition-colors inline-flex items-center gap-1"
+                    >
+                      {service.link.startsWith('#') ? 'Solicitar' : 'Más info'}
+                      <span>→</span>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* CTA después de servicios */}
+          <div className="text-center mt-16">
+            <a
+              href="#contacto"
+              onClick={() => trackCTAClick('servicios_cta')}
+              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg font-semibold text-white hover:opacity-90 transition-opacity shadow-lg shadow-cyan-500/20"
+            >
+              Solicitar Presupuesto
+            </a>
           </div>
         </div>
-      ))}
-    </div>
-  </div>
-</section>
+      </section>
 
-      {/* Portfolio - OPTIMIZADO con priority en primera imagen */}
+      {/* Portfolio */}
       <section id="portfolio" className="py-20 px-4 sm:px-6 lg:px-8 relative">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
@@ -447,7 +691,6 @@ export default function Home() {
                   <div className="p-6 flex-1 flex flex-col">
                     <div className="flex items-start justify-between mb-3">
                       <h3 className="font-display text-xl font-bold text-white">{project.name}</h3>
-                      {/* ✅ PORTFOLIO LINK - TRACKING AÑADIDO */}
                       <a 
                         href={project.url} 
                         target="_blank" 
@@ -473,11 +716,22 @@ export default function Home() {
               </div>
             ))}
           </div>
+
+          {/* CTA después de portfolio */}
+          <div className="text-center mt-16">
+            <a
+              href="#contacto"
+              onClick={() => trackCTAClick('portfolio_cta')}
+              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg font-semibold text-white hover:opacity-90 transition-opacity shadow-lg shadow-cyan-500/20"
+            >
+              Solicitar Presupuesto
+            </a>
+          </div>
         </div>
       </section>
 
-      {/* Process - SIMPLIFICADO */}
-      <section id="proceso" className="py-20 px-4 sm:px-6 lg:px-8 relative">
+      {/* Process */}
+      <section id="proceso" className="py-20 px-4 sm:px-6 lg:px-8 relative bg-[#0f0f1a]/50">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="text-center mb-16">
             <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
@@ -493,7 +747,7 @@ export default function Home() {
               { step: '04', title: 'Entrega', description: '30 días de soporte incluido.' }
             ].map((item, index) => (
               <div key={index} className="relative">
-                <div className="relative bg-[#0f0f1a] rounded-2xl p-6 border border-cyan-500/10">
+                <div className="relative bg-[#0a0a0f] rounded-2xl p-6 border border-cyan-500/10">
                   <div className="font-display text-5xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent mb-4">
                     {item.step}
                   </div>
@@ -503,146 +757,21 @@ export default function Home() {
               </div>
             ))}
           </div>
-        </div>
-      </section>
 
-      {/* Contact Form - OPTIMIZADO */}
-      <section id="contacto" className="py-20 px-4 sm:px-6 lg:px-8 relative">
-        <div className="max-w-4xl mx-auto relative z-10">
-          <div className="text-center mb-16">
-            <h2 className="font-display text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              Solicita tu Presupuesto
-            </h2>
-            <p className="text-xl text-gray-400">
-              Respuesta en menos de 24 horas
-            </p>
-          </div>
-
-          <div className="relative group">
-            <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-3xl blur opacity-20 group-hover:opacity-30 transition" />
-            <form onSubmit={handleSubmit} className="relative bg-[#0f0f1a] rounded-3xl p-8 md:p-12 border border-cyan-500/10">
-              <div className="grid md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-semibold text-gray-300 mb-2">Nombre *</label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white placeholder-gray-500"
-                    placeholder="Tu nombre"
-                  />
-                </div>
-                <div>
-                  <label htmlFor="email" className="block text-sm font-semibold text-gray-300 mb-2">Email *</label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white placeholder-gray-500"
-                    placeholder="tu@email.com"
-                  />
-                </div>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label htmlFor="projectType" className="block text-sm font-semibold text-gray-300 mb-2">Tipo de Proyecto *</label>
-                  <select
-                    id="projectType"
-                    name="projectType"
-                    required
-                    value={formData.projectType}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white"
-                  >
-                    <option value="">Selecciona...</option>
-                    <option value="web">Web Corporativa</option>
-                    <option value="ecommerce">E-commerce</option>
-                    <option value="app">App Móvil</option>
-                    <option value="backend">Backend/API</option>
-                    <option value="otro">Otro</option>
-                  </select>
-                </div>
-                <div>
-                  <label htmlFor="budget" className="block text-sm font-semibold text-gray-300 mb-2">Presupuesto *</label>
-                  <select
-                    id="budget"
-                    name="budget"
-                    required
-                    value={formData.budget}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-white"
-                  >
-                    <option value="">Selecciona...</option>
-                    <option value="<3000">Menos de 3.000€</option>
-                    <option value="3000-6000">3.000€ - 6.000€</option>
-                    <option value="6000-12000">6.000€ - 12.000€</option>
-                    <option value=">12000">Más de 12.000€</option>
-                  </select>
-                </div>
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="description" className="block text-sm font-semibold text-gray-300 mb-2">Cuéntanos sobre tu proyecto *</label>
-                <textarea
-                  id="description"
-                  name="description"
-                  required
-                  rows={5}
-                  value={formData.description}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-lg bg-black/30 border border-cyan-500/20 focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all resize-none text-white placeholder-gray-500"
-                  placeholder="Describe tu proyecto..."
-                />
-              </div>
-
-              <div className="mb-8">
-                <label className="flex items-start gap-3 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    name="privacy"
-                    required
-                    checked={formData.privacy}
-                    onChange={handleChange}
-                    className="mt-1 w-5 h-5 rounded border-cyan-500/30 bg-black/30 text-cyan-500 focus:ring-cyan-500"
-                  />
-                  <span className="text-sm text-gray-400">
-                    Acepto la política de privacidad *
-                  </span>
-                </label>
-              </div>
-
-              <button
-                type="submit"
-                disabled={formStatus === 'sending'}
-                className="w-full px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg font-bold text-lg text-white hover:opacity-90 transition-opacity disabled:opacity-50"
-              >
-                {formStatus === 'sending' ? 'Enviando...' : 'Solicitar Presupuesto'}
-              </button>
-
-              {formStatus === 'success' && (
-                <div className="mt-6 p-4 bg-green-500/10 border border-green-500/30 rounded-lg text-green-400 text-center">
-                  ✓ ¡Mensaje enviado! Te responderemos pronto.
-                </div>
-              )}
-
-              {formStatus === 'error' && (
-                <div className="mt-6 p-4 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-center">
-                  ⚠️ Error al enviar. Por favor, inténtalo de nuevo.
-                </div>
-              )}
-            </form>
+          {/* CTA después de proceso */}
+          <div className="text-center mt-16">
+            <a
+              href="#contacto"
+              onClick={() => trackCTAClick('proceso_cta')}
+              className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-cyan-500 to-purple-500 rounded-lg font-semibold text-white hover:opacity-90 transition-opacity shadow-lg shadow-cyan-500/20"
+            >
+              Empezar mi Proyecto
+            </a>
           </div>
         </div>
       </section>
 
-      {/* Footer - SIMPLIFICADO */}
+      {/* Footer */}
       <footer className="relative py-16 px-4 sm:px-6 lg:px-8 border-t border-cyan-500/10">
         <div className="max-w-7xl mx-auto relative z-10">
           <div className="grid md:grid-cols-4 gap-12 mb-12">
@@ -653,38 +782,39 @@ export default function Home() {
               <p className="text-gray-400 mb-4">Desarrollo web y móvil profesional.</p>
             </div>
 
-           <div>
-  <h4 className="font-display font-bold mb-4 text-white">Servicios</h4>
-  <ul className="space-y-2 text-gray-400">
-    <li>
-      <Link  
-        href="/desarrollo-web-react" 
-        onClick={() => trackCTAClick('footer_servicios_web')}
-        className="hover:text-cyan-400 transition-colors"
-      >
-        Desarrollo Web React
-      </Link>
-    </li>
-    <li>
-      <Link  
-        href="/desarrollo-app-movil"  
-        onClick={() => trackCTAClick('footer_servicios_mobile')}
-        className="hover:text-cyan-400 transition-colors"
-      >
-        Apps Móviles React Native
-      </Link>
-    </li>
-    <li>
-      <Link  
-        href="/desarrollo-backend-python"  
-        onClick={() => trackCTAClick('footer_servicios_backend')}
-        className="hover:text-cyan-400 transition-colors"
-      >
-        Backend Python
-      </Link>
-    </li>
-  </ul>
-</div>
+            <div>
+              <h4 className="font-display font-bold mb-4 text-white">Servicios</h4>
+              <ul className="space-y-2 text-gray-400">
+                <li>
+                  <Link  
+                    href="/desarrollo-web-react" 
+                    onClick={() => trackCTAClick('footer_servicios_web')}
+                    className="hover:text-cyan-400 transition-colors"
+                  >
+                    Desarrollo Web React
+                  </Link>
+                </li>
+                <li>
+                  <Link  
+                    href="/desarrollo-app-movil"  
+                    onClick={() => trackCTAClick('footer_servicios_mobile')}
+                    className="hover:text-cyan-400 transition-colors"
+                  >
+                    Apps Móviles React Native
+                  </Link>
+                </li>
+                <li>
+                  <Link  
+                    href="/desarrollo-backend-python"  
+                    onClick={() => trackCTAClick('footer_servicios_backend')}
+                    className="hover:text-cyan-400 transition-colors"
+                  >
+                    Backend Python
+                  </Link>
+                </li>
+              </ul>
+            </div>
+
             <div>
               <h4 className="font-display font-bold mb-4 text-white">Empresa</h4>
               <ul className="space-y-2 text-gray-400">
